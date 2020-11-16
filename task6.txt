@@ -1,0 +1,40 @@
+a) Select all people, who get paid more than their direct chiefs
+----
+SELECT p.name, p.wage, p.chief_id
+FROM person p
+LEFT JOIN person c ON p.chief_id = c.id
+WHERE p.wage > c.wage
+----
+
+b) Select a list of all offices along with a person with the highest wage in each. if more than one person has the
+highest wage, display them all. The office should be selected even if it has no people.
+----
+SELECT b.name office,  p.wage wage, p.name as name
+FROM branch b
+LEFT JOIN person p ON b.id = p.office_id
+WHERE p.wage IN(
+    SELECT MAX(wage) FROM person p
+    GROUP BY p.office_id
+)
+OR p.wage IS NULL
+ORDER BY office ASC
+----
+
+c) Select all chiefs, who have exactly one direct subordinate.
+----
+SELECT p.chief_id, COUNT(c.id) as subordinate
+FROM person c
+LEFT JOIN person p ON c.id = p.chief_id
+WHERE p.chief_id IS NOT NULL
+GROUP BY p.chief_id
+HAVING subordinate = 1
+----
+
+d) Select all offices sorted by total wage of people in it, descending.
+----
+SELECT b.name as name, SUM(p.wage) as wage
+FROM branch b
+INNER JOIN person p ON b.id = p.office_id
+GROUP BY p.office_id
+ORDER BY wage DESC
+----
